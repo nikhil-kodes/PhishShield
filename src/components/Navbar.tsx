@@ -28,7 +28,6 @@ export const Navbar = () => {
     { name: 'Home', href: '/' },
     { name: 'Features', href: '/#features' },
     { name: 'About', href: '/#about' },
-    { name: 'Contact', href: '/#contact' },
   ];
 
   const dashboardNavigation = [

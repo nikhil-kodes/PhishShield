@@ -7,6 +7,7 @@ import { Toaster as HotToaster } from 'react-hot-toast';
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Navbar } from "@/components/Navbar";
+import {ScrollToHash} from "@/components/ui/hashScroll"
 
 // Pages
 import Home from "./pages/Home";
@@ -34,6 +35,7 @@ const App = () => (
           <div className="min-h-screen bg-background">
             <Navbar />
             <main className="pt-16">
+              <ScrollToHash />
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
