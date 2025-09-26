@@ -1,0 +1,377 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { 
+  CheckCircle, 
+  XCircle, 
+  Award, 
+  ArrowRight, 
+  ArrowLeft,
+  RotateCcw,
+  Trophy,
+  Star
+} from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { apiClient, type QuizQuestion } from '@/services/apiClient';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Link } from 'react-router-dom';
+
+interface QuizState {
+  currentQuestion: number;
+  answers: Record<string, number>;
+  showExplanation: boolean;
+  selectedOption: number | null;
+  isComplete: boolean;
+  results: any;
+}
+
+export default function Quiz() {
+  const { user } = useAuth();
+  const [quizState, setQuizState] = useState<QuizState>({
+    currentQuestion: 0,
+    answers: {},
+    showExplanation: false,
+    selectedOption: null,
+    isComplete: false,
+    results: null,
+  });
+
+  const { data: questions, isLoading } = useQuery({
+    queryKey: ['quiz-questions'],
+    queryFn: () => apiClient.getQuizQuestions(5),
+    select: (response) => response.data,
+  });
+
+  const submitQuizMutation = useMutation({
+    mutationFn: (answers: Record<string, number>) => 
+      apiClient.submitQuizResults(answers),
+    onSuccess: (response) => {
+      if (response.ok && response.data) {
+        setQuizState(prev => ({
+          ...prev,
+          isComplete: true,
+          results: response.data,
+        }));
+      }
+    },
+  });
+
+  const currentQuestion = questions?.[quizState.currentQuestion];
+  const progress = ((quizState.currentQuestion + 1) / (questions?.length || 5)) * 100;
+
+  const handleOptionSelect = (optionIndex: number) => {
+    if (quizState.showExplanation) return;
+    
+    setQuizState(prev => ({
+      ...prev,
+      selectedOption: optionIndex,
+    }));
+  };
+
+  const handleSubmitAnswer = () => {
+    if (quizState.selectedOption === null || !currentQuestion) return;
+
+    const newAnswers = {
+      ...quizState.answers,
+      [currentQuestion.id]: quizState.selectedOption,
+    };
+
+    setQuizState(prev => ({
+      ...prev,
+      answers: newAnswers,
+      showExplanation: true,
+    }));
+  };
+
+  const handleNextQuestion = () => {
+    if (!questions) return;
+
+    if (quizState.currentQuestion < questions.length - 1) {
+      setQuizState(prev => ({
+        ...prev,
+        currentQuestion: prev.currentQuestion + 1,
+        selectedOption: null,
+        showExplanation: false,
+      }));
+    } else {
+      // Submit quiz
+      submitQuizMutation.mutate(quizState.answers);
+    }
+  };
+
+  const restartQuiz = () => {
+    setQuizState({
+      currentQuestion: 0,
+      answers: {},
+      showExplanation: false,
+      selectedOption: null,
+      isComplete: false,
+      results: null,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-pulse space-y-4 text-center">
+          <div className="h-8 w-48 bg-muted rounded mx-auto"></div>
+          <div className="h-4 w-32 bg-muted rounded mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (quizState.isComplete && quizState.results) {
+    const { score, correctAnswers, totalQuestions, creditsEarned } = quizState.results;
+    const percentage = Math.round(score);
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center space-y-8"
+          >
+            <Card className="overflow-hidden">
+              <CardContent className="p-8 text-center space-y-6">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring" }}
+                  className="w-24 h-24 mx-auto bg-gradient-primary rounded-full flex items-center justify-center"
+                >
+                  <Trophy className="h-12 w-12 text-white" />
+                </motion.div>
+
+                <div>
+                  <h1 className="text-3xl font-bold mb-2">Quiz Complete!</h1>
+                  <p className="text-muted-foreground">
+                    Great job on testing your cybersecurity knowledge
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
+                  <div className="space-y-2">
+                    <div className="text-3xl font-bold text-primary">{percentage}%</div>
+                    <p className="text-sm text-muted-foreground">Final Score</p>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-3xl font-bold text-success">{correctAnswers}/{totalQuestions}</div>
+                    <p className="text-sm text-muted-foreground">Correct Answers</p>
+                  </div>
+                </div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="bg-success/10 border border-success/20 rounded-lg p-4"
+                >
+                  <div className="flex items-center justify-center gap-2 text-success mb-2">
+                    <Award className="h-5 w-5" />
+                    <span className="font-semibold">Credits Earned</span>
+                  </div>
+                  <p className="text-2xl font-bold text-success">+{creditsEarned} credits</p>
+                </motion.div>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button onClick={restartQuiz} variant="outline" className="flex items-center gap-2">
+                    <RotateCcw className="h-4 w-4" />
+                    Take Another Quiz
+                  </Button>
+                  <Button asChild className="bg-gradient-primary text-white">
+                    <Link to="/dashboard">
+                      Back to Dashboard
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!questions?.length) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl font-bold">No questions available</h2>
+          <p className="text-muted-foreground">Please try again later</p>
+          <Button asChild>
+            <Link to="/dashboard">Back to Dashboard</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/10">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4 mb-8"
+        >
+          <h1 className="text-3xl font-bold">Cybersecurity Knowledge Quiz</h1>
+          <p className="text-muted-foreground">
+            Test your knowledge and earn credits to unlock features
+          </p>
+          
+          {/* Progress */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Question {quizState.currentQuestion + 1} of {questions.length}</span>
+              <span>{Math.round(progress)}% Complete</span>
+            </div>
+            <Progress value={progress} className="h-2" />
+          </div>
+        </motion.div>
+
+        {/* Question Card */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={quizState.currentQuestion}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="shadow-strong">
+              <CardHeader>
+                <CardTitle className="text-xl">
+                  {currentQuestion?.question}
+                </CardTitle>
+              </CardHeader>
+              
+              <CardContent className="space-y-6">
+                {/* Options */}
+                <div className="space-y-3">
+                  {currentQuestion?.options.map((option, index) => {
+                    const isSelected = quizState.selectedOption === index;
+                    const isCorrect = index === currentQuestion.correctOptionId;
+                    const showResult = quizState.showExplanation;
+                    
+                    let buttonVariant = 'outline';
+                    let className = 'text-left h-auto p-4 transition-all duration-200';
+                    
+                    if (showResult) {
+                      if (isCorrect) {
+                        className += ' border-success bg-success/10 text-success-foreground';
+                      } else if (isSelected && !isCorrect) {
+                        className += ' border-destructive bg-destructive/10 text-destructive-foreground';
+                      }
+                    } else if (isSelected) {
+                      className += ' border-primary bg-primary/10';
+                    }
+
+                    return (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <Button
+                          variant={buttonVariant as any}
+                          onClick={() => handleOptionSelect(index)}
+                          disabled={quizState.showExplanation}
+                          className={className}
+                        >
+                          <div className="flex items-center gap-3 w-full">
+                            <div className="w-8 h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0">
+                              {showResult && isCorrect && (
+                                <CheckCircle className="h-5 w-5 text-success" />
+                              )}
+                              {showResult && isSelected && !isCorrect && (
+                                <XCircle className="h-5 w-5 text-destructive" />
+                              )}
+                              {!showResult && (
+                                <span className="text-sm font-medium">
+                                  {String.fromCharCode(65 + index)}
+                                </span>
+                              )}
+                            </div>
+                            <span className="flex-1">{option}</span>
+                          </div>
+                        </Button>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {/* Explanation */}
+                <AnimatePresence>
+                  {quizState.showExplanation && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="bg-muted/50 rounded-lg p-4 border-l-4 border-primary"
+                    >
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        <Star className="h-4 w-4 text-primary" />
+                        Explanation
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        {currentQuestion?.explanation}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Action Buttons */}
+                <div className="flex justify-between pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setQuizState(prev => ({ ...prev, currentQuestion: Math.max(0, prev.currentQuestion - 1) }))}
+                    disabled={quizState.currentQuestion === 0}
+                    className="flex items-center gap-2"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Previous
+                  </Button>
+
+                  {!quizState.showExplanation ? (
+                    <Button
+                      onClick={handleSubmitAnswer}
+                      disabled={quizState.selectedOption === null}
+                      className="bg-gradient-primary text-white flex items-center gap-2"
+                    >
+                      Submit Answer
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleNextQuestion}
+                      disabled={submitQuizMutation.isPending}
+                      className="bg-gradient-primary text-white flex items-center gap-2"
+                    >
+                      {quizState.currentQuestion === questions.length - 1 ? (
+                        submitQuizMutation.isPending ? (
+                          'Submitting...'
+                        ) : (
+                          'Finish Quiz'
+                        )
+                      ) : (
+                        <>
+                          Next Question
+                          <ArrowRight className="h-4 w-4" />
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
