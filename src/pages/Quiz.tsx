@@ -217,10 +217,10 @@ export default function Quiz() {
 										if (showResult) {
 											if (isCorrect)
 												className +=
-													" border-success bg-success/10 text-success-foreground";
+													" border-success bg-success/10 text-gray-900";
 											else if (isSelected && !isCorrect)
 												className +=
-													" border-destructive bg-destructive/10 text-destructive-foreground";
+													" border-destructive bg-destructive/10 text-gray-400";
 										} else if (isSelected) {
 											className += " border-primary bg-primary/10";
 										}

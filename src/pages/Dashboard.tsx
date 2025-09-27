@@ -371,15 +371,15 @@ export default function Dashboard() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">This Week</span>
-                    <span className="font-semibold">15 threats blocked</span>
+                    <span className="font-semibold"> threats blocked</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">This Month</span>
-                    <span className="font-semibold">127 scans completed</span>
+                    <span className="text-sm text-muted-foreground">0 This Month</span>
+                    <span className="font-semibold">0 scans completed</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Quiz Score</span>
-                    <span className="font-semibold text-success">85%</span>
+                    <span className="font-semibold text-success">0%</span>
                   </div>
                 </CardContent>
               </Card>

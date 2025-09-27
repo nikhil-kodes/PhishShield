@@ -45,16 +45,9 @@ export default function Login() {
   if (isAuthenticated) return <Navigate to={from} replace />;
 
   const onSubmit = async (data: LoginFormData) => {
-    console.log("Form submitted!", data); // Debug
-    try {
-      const success = await login(data.email, data.password);
-      console.log("Login success?", success); // Debug
-      if (!success) alert("Invalid credentials");
-    } catch (err) {
-      console.error("Login error:", err);
-      alert("An error occurred while logging in.");
-    }
-  };
+  const success = await login(data.email, data.password);
+  if (!success) alert("Invalid credentials");
+};
 
   // Demo login handler (uses provided demo credentials)
   const handleDemoLogin = async () => {
