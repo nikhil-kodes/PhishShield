@@ -40,11 +40,11 @@ const ChatbotFAB = () => {
     setMessage('');
 
     // Simulate AI response
-    const response = await apiClient.sendChatMessage(message);
-    if (response.ok && response.data) {
-      const aiMessage = { id: Date.now() + 1, text: response.data.message, isUser: false };
-      setMessages(prev => [...prev, aiMessage]);
-    }
+    // const response = await apiClient.sendChatMessage(message);
+    // if (response.ok && response.data) {
+    //   const aiMessage = { id: Date.now() + 1, text: response.data.message, isUser: false };
+    //   setMessages(prev => [...prev, aiMessage]);
+    // }
   };
 
   return (

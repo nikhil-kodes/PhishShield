@@ -33,10 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	const [user, setUser] = useState<User | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 
-	const isAuthenticated = !!user;
-	{
-		/*&& apiClient.isAuthenticated();*/
-	}
+	const isAuthenticated = !!user && apiClient.isAuthenticated();
 
 	// Load user data on app start
 	useEffect(() => {
@@ -63,24 +60,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	const login = async (email: string, password: string): Promise<boolean> => {
 		try {
 			setIsLoading(true);
-			if (email === "user@phishshield.ai" && password === "password") {
-				const demoUser: User = {
-					id: "demo-id",
-					name: "Demo User",
-					email: "user@phishshield.ai",
-					avatar: "",
-					credits: 100,
-					phoneNumber: "0000000000",
-					createdAt: new Date().toISOString(),
-				};
-				setUser(demoUser);
-				toast.success("Logged in with Demo Account 🎉");
-				return true;
-			}
+			// if (email === "user@phishshield.ai" && password === "password") {
+			// 	const demoUser: User = {
+			// 		id: "demo-id",
+			// 		name: "Demo User",
+			// 		email: "user@phishshield.ai",
+			// 		avatar: "",
+			// 		credits: 100,
+			// 		phoneNumber: "0000000000",
+			// 		createdAt: new Date().toISOString(),
+			// 	};
+			// 	setUser(demoUser);
+			// 	toast.success("Logged in with Demo Account 🎉");
+			// 	return true;
+			// }
 			const response = await apiClient.login({ email, password });
-
+			console.log(response);
 			if (response.ok && response.data) {
-				setUser(response.data.user);
+				const { token, user } = response.data;
+				apiClient.setAuthToken(token);
+				setUser(user);
 				toast.success("Welcome back!");
 				return true;
 			} else {
@@ -106,7 +105,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			const response = await apiClient.signup(userData);
 
 			if (response.ok && response.data) {
-				setUser(response.data.user);
+				const { token, user } = response.data;
+				apiClient.setAuthToken(token);
+				setUser(user);
 				toast.success("Account created successfully!");
 				return true;
 			} else {
@@ -123,7 +124,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
 	const logout = async (): Promise<void> => {
 		try {
-			await apiClient.logout();
+			apiClient.removeAuthToken();
+			// await apiClient.logout();
 			setUser(null);
 			toast.success("Logged out successfully");
 		} catch (error) {

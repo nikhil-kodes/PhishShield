@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo128.png';
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -48,8 +48,12 @@ export default function Signup() {
   }
 
   const onSubmit = async (data: SignupFormData) => {
-    const success = await signup(data);
-    // Navigation will be handled by the auth context
+    await signup({
+    name: data.name,
+    email: data.email,
+    password: data.password,
+    phoneNumber: data.phoneNumber,
+  });
   };
 
   // Password strength indicators
