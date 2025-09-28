@@ -39,11 +39,9 @@ A modern, AI-powered cybersecurity application that protects users from phishing
 - **Recharts** - Data visualization
 
 ### Features
-- **Mock API Integration** - Demo mode with realistic data
 - **Protected Routes** - Authentication-based navigation
 - **Responsive Design** - Mobile-first approach
 - **Accessibility** - WCAG AA compliant
-- **Progressive Enhancement** - Works without JavaScript
 
 ## 🎨 Design System
 
@@ -87,11 +85,6 @@ A modern, AI-powered cybersecurity application that protects users from phishing
 4. **Open your browser**
    Navigate to `http://localhost:8080`
 
-### Demo Credentials
-For testing the application, use these credentials:
-- **Email**: `user@phishshield.ai`
-- **Password**: `password`
-
 ## 📱 Application Structure
 
 ### Pages
@@ -121,7 +114,7 @@ The application includes a comprehensive mock API that simulates:
 
 ### Data Protection
 - Client-side form validation with Zod schemas
-- Secure token-based authentication simulation
+- Secure token-based authentication
 - Input sanitization and XSS prevention
 - CSRF protection patterns
 
@@ -156,14 +149,6 @@ The application includes a comprehensive mock API that simulates:
 - **Advanced Caching**: Service worker implementation
 - **Performance Optimization**: Code splitting and lazy loading
 
-## 📊 Mock Data
-
-The application uses realistic mock data for demonstration:
-- **User Profiles**: Sample user information and statistics
-- **Threat History**: Simulated phishing attempts and blocked links
-- **Quiz Questions**: Cybersecurity knowledge assessments
-- **Analytics**: Protection metrics and performance data
-
 ## 🤝 Contributing
 
 ### Development Guidelines
@@ -184,10 +169,6 @@ npm run preview
 # Lint code
 npm run lint
 ```
-
-## 📄 License
-
-This project is built with [Lovable](https://lovable.dev) - The AI-powered web development platform.
 
 ---
 
