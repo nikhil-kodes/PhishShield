@@ -28,91 +28,93 @@ const queryClient = new QueryClient({
 	},
 });
 
-useEffect(() => {
-	const fetchApi = async () => {
-		try {
-			const response = await fetch(`${import.meta.env.VITE_API_URL}/`, {
-				method: "GET",
-			});
-			const data = await response.json();
-			console.log("API response:", data);
-		} catch (err) {
-			console.error("API fetch failed:", err);
-		}
-	};
+const App = () => {
+	useEffect(() => {
+		const fetchApi = async () => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_API_URL}/`, {
+					method: "GET",
+				});
+				const data = await response.json();
+				console.log("API response:", data);
+			} catch (err) {
+				console.error("API fetch failed:", err);
+			}
+		};
 
-	fetchApi(); // call inside effect
-}, []);
+		fetchApi(); // call inside effect
+	}, []);
 
-const App = () => (
-	<QueryClientProvider client={queryClient}>
-		<AuthProvider>
-			<TooltipProvider>
-				<BrowserRouter>
-					<div className="min-h-screen bg-background">
-						<Navbar />
-						<main className="pt-16">
-							<ScrollToHash />
-							<Routes>
-								<Route
-									path="/"
-									element={<Home />}
-								/>
-								<Route
-									path="/login"
-									element={<Login />}
-								/>
-								<Route
-									path="/signup"
-									element={<Signup />}
-								/>
-								<Route
-									path="/dashboard"
-									element={
-										<ProtectedRoute>
-											<Dashboard />
-										</ProtectedRoute>
-									}
-								/>
-								<Route
-									path="/quiz"
-									element={
-										<ProtectedRoute>
-											<Quiz />
-										</ProtectedRoute>
-									}
-								/>
-								<Route
-									path="/profile"
-									element={
-										<ProtectedRoute>
-											<Profile />
-										</ProtectedRoute>
-									}
-								/>
-								<Route
-									path="*"
-									element={<NotFound />}
-								/>
-							</Routes>
-						</main>
-					</div>
-					<Toaster />
-					<Sonner />
-					<HotToaster
-						position="top-right"
-						toastOptions={{
-							style: {
-								background: "hsl(var(--card))",
-								color: "hsl(var(--card-foreground))",
-								border: "1px solid hsl(var(--border))",
-							},
-						}}
-					/>
-				</BrowserRouter>
-			</TooltipProvider>
-		</AuthProvider>
-	</QueryClientProvider>
-);
+	return (
+		<QueryClientProvider client={queryClient}>
+			<AuthProvider>
+				<TooltipProvider>
+					<BrowserRouter>
+						<div className="min-h-screen bg-background">
+							<Navbar />
+							<main className="pt-16">
+								<ScrollToHash />
+								<Routes>
+									<Route
+										path="/"
+										element={<Home />}
+									/>
+									<Route
+										path="/login"
+										element={<Login />}
+									/>
+									<Route
+										path="/signup"
+										element={<Signup />}
+									/>
+									<Route
+										path="/dashboard"
+										element={
+											<ProtectedRoute>
+												<Dashboard />
+											</ProtectedRoute>
+										}
+									/>
+									<Route
+										path="/quiz"
+										element={
+											<ProtectedRoute>
+												<Quiz />
+											</ProtectedRoute>
+										}
+									/>
+									<Route
+										path="/profile"
+										element={
+											<ProtectedRoute>
+												<Profile />
+											</ProtectedRoute>
+										}
+									/>
+									<Route
+										path="*"
+										element={<NotFound />}
+									/>
+								</Routes>
+							</main>
+						</div>
+						<Toaster />
+						<Sonner />
+						<HotToaster
+							position="top-right"
+							toastOptions={{
+								style: {
+									background: "hsl(var(--card))",
+									color: "hsl(var(--card-foreground))",
+									border: "1px solid hsl(var(--border))",
+								},
+							}}
+						/>
+					</BrowserRouter>
+				</TooltipProvider>
+			</AuthProvider>
+		</QueryClientProvider>
+	);
+};
 
 export default App;
