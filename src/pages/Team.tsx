@@ -9,7 +9,7 @@ import {
   Activity,
   UserPlus,
   Cpu,
-  Hdd,
+  HardDrive,
   Network
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -138,7 +138,7 @@ export default function TeamPage() {
          </Card>
          <Card className="p-8 border-border/60 bg-background/50 flex flex-col gap-6">
             <h4 className="font-black uppercase tracking-tight text-sm flex items-center gap-2">
-               <Hdd className="w-4 h-4 text-blue-500" /> Decentralized Storage
+               <HardDrive className="w-4 h-4 text-blue-500" /> Decentralized Storage
             </h4>
             <div className="flex flex-col gap-4">
                <div className="flex items-center justify-between">
