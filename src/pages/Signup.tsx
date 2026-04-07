@@ -4,13 +4,12 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Shield, Loader2, CheckCircle, X } from 'lucide-react';
+import { Eye, EyeOff, ShieldCheck, Loader2, CheckCircle, X, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import logo from '@/assets/logo128.png';
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -42,21 +41,19 @@ export default function Signup() {
 
   const password = watch('password');
 
-  // Redirect if already authenticated
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 
   const onSubmit = async (data: SignupFormData) => {
     await signup({
-    name: data.name,
-    email: data.email,
-    password: data.password,
-    phoneNumber: data.phoneNumber,
-  });
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      phoneNumber: data.phoneNumber,
+    });
   };
 
-  // Password strength indicators
   const passwordChecks = [
     { label: 'At least 8 characters', valid: password?.length >= 8 },
     { label: 'One uppercase letter', valid: /[A-Z]/.test(password || '') },
@@ -66,169 +63,157 @@ export default function Signup() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-background dark:bg-[#09090b]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-background via-primary/5 to-accent/10">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-background dark:bg-[#09090b] relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute inset-0 bg-grid-black/[0.02] dark:bg-grid-white/[0.02] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative z-10"
       >
-        <Card className="shadow-strong">
-          <CardHeader className="text-center space-y-4">
-            <div className="flex justify-center">
-              <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center">
-                <img src={logo} alt="PhishShield AI" className="w-10 h-10" />
-              </div>
-            </div>
-            <div>
-              <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
-              <CardDescription>
-                Start protecting yourself from phishing attacks today
-              </CardDescription>
-            </div>
+        <div className="flex flex-col items-center mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <ShieldCheck className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-mono font-bold tracking-tighter text-foreground">
+              PhishShield
+            </span>
+          </div>
+          <p className="text-sm font-mono text-muted-foreground uppercase tracking-widest text-center">
+            Create Security Profile
+          </p>
+        </div>
+
+        <Card className="border border-border bg-card/50 backdrop-blur-xl shadow-2xl">
+          <CardHeader className="space-y-1 pb-6">
+            <CardTitle className="text-2xl font-bold tracking-tight">Sign Up</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">
+              Begin your real-time phish-protection journey
+            </CardDescription>
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full name</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Enter your full name"
-                    {...register('name')}
-                    className={errors.name ? 'border-destructive' : ''}
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-destructive">{errors.name.message}</p>
-                  )}
-                </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-xs uppercase font-mono tracking-wider font-semibold text-muted-foreground">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  {...register('name')}
+                  className={`bg-background/50 border-border focus:border-primary transition-all ${errors.name ? 'border-destructive' : ''}`}
+                />
+                {errors.name && (
+                  <p className="text-[10px] uppercase font-mono font-bold text-destructive">{errors.name.message}</p>
+                )}
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    {...register('email')}
-                    className={errors.email ? 'border-destructive' : ''}
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email.message}</p>
-                  )}
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-xs uppercase font-mono tracking-wider font-semibold text-muted-foreground">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="john@example.com"
+                  {...register('email')}
+                  className={`bg-background/50 border-border focus:border-primary transition-all ${errors.email ? 'border-destructive' : ''}`}
+                />
+                {errors.email && (
+                  <p className="text-[10px] uppercase font-mono font-bold text-destructive">{errors.email.message}</p>
+                )}
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="phoneNumber">Phone number</Label>
-                  <Input
-                    id="phoneNumber"
-                    type="tel"
-                    placeholder="+1234567890"
-                    {...register('phoneNumber')}
-                    className={errors.phoneNumber ? 'border-destructive' : ''}
-                  />
-                  {errors.phoneNumber && (
-                    <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>
-                  )}
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="phoneNumber" className="text-xs uppercase font-mono tracking-wider font-semibold text-muted-foreground">Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  type="tel"
+                  placeholder="+1 (555) 000-0000"
+                  {...register('phoneNumber')}
+                  className={`bg-background/50 border-border focus:border-primary transition-all ${errors.phoneNumber ? 'border-destructive' : ''}`}
+                />
+                {errors.phoneNumber && (
+                  <p className="text-[10px] uppercase font-mono font-bold text-destructive">{errors.phoneNumber.message}</p>
+                )}
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Create a strong password"
-                      {...register('password')}
-                      className={errors.password ? 'border-destructive pr-10' : 'pr-10'}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
-                  {errors.password && (
-                    <p className="text-sm text-destructive">{errors.password.message}</p>
-                  )}
-                  
-                  {/* Password strength indicators */}
-                  {password && (
-                    <div className="space-y-2 mt-3">
-                      <p className="text-sm font-medium text-muted-foreground">Password requirements:</p>
-                      <div className="grid grid-cols-1 gap-1">
-                        {passwordChecks.map((check, index) => (
-                          <div key={index} className="flex items-center gap-2 text-xs">
-                            {check.valid ? (
-                              <CheckCircle className="h-3 w-3 text-success" />
-                            ) : (
-                              <X className="h-3 w-3 text-destructive" />
-                            )}
-                            <span className={check.valid ? 'text-success' : 'text-muted-foreground'}>
-                              {check.label}
-                            </span>
-                          </div>
-                        ))}
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-xs uppercase font-mono tracking-wider font-semibold text-muted-foreground">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    {...register('password')}
+                    className={`bg-background/50 border-border focus:border-primary transition-all pr-10 ${errors.password ? 'border-destructive' : ''}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-[10px] uppercase font-mono font-bold text-destructive">{errors.password.message}</p>
+                )}
+                
+                {/* Password strength and hint */}
+                {password && (
+                  <div className="grid grid-cols-2 gap-1 mt-2">
+                    {passwordChecks.map((check, index) => (
+                      <div key={index} className="flex items-center gap-1.5 text-[9px] uppercase font-mono tracking-tighter">
+                        {check.valid ? (
+                          <CheckCircle className="h-2.5 w-2.5 text-success" />
+                        ) : (
+                          <X className="h-2.5 w-2.5 text-muted-foreground/30" />
+                        )}
+                        <span className={check.valid ? 'text-success font-bold' : 'text-muted-foreground/50'}>
+                          {check.label}
+                        </span>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-primary text-white"
+                className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-11 uppercase"
                 size="lg"
               >
                 {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Creating account...
-                  </div>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
-                  'Create account'
+                  'Establish Secure Account'
                 )}
               </Button>
 
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">
-                  Already have an account?{' '}
+              <div className="text-center mt-6">
+                <p className="text-xs text-muted-foreground">
+                  Already secured?{' '}
                   <Link
                     to="/login"
-                    className="text-primary hover:text-primary-dark transition-colors font-medium"
+                    className="text-primary font-bold hover:underline transition-all"
                   >
-                    Sign in
+                    Return to Login
                   </Link>
                 </p>
               </div>
 
-              <div className="text-xs text-muted-foreground text-center">
-                By creating an account, you agree to our{' '}
-                <a href="#terms" className="text-primary hover:underline">
-                  Terms of Service
-                </a>{' '}
-                and{' '}
-                <a href="#privacy" className="text-primary hover:underline">
-                  Privacy Policy
-                </a>
+              <div className="text-[9px] text-muted-foreground/50 text-center uppercase tracking-widest font-mono pt-4 border-t border-border/50">
+                Data protected with military-grade encryption
               </div>
             </form>
           </CardContent>

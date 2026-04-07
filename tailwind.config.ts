@@ -157,6 +157,10 @@ export default {
         "slide-up": "slide-up 0.4s ease-out",
         "pulse-soft": "pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
+      fontFamily: {
+        sans: ["Geist Sans", "Inter", "sans-serif"],
+        mono: ["Geist Mono", "JetBrains Mono", "monospace"],
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
